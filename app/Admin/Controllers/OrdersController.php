@@ -158,7 +158,14 @@ class OrdersController extends AdminController
 
         //是否同意退款
         if($request->input("agree")){
-
+            $extra = $order->extra?:[];
+            if(isset($extra["refund_disagree_reason"])){
+                unset($extra["refund_disagree_reason"]);
+            }
+            $order->update([
+                "extra"         => $extra,
+            ]);
+            $this->_refundOrder($order);
         } else {
             $extra = $order->extra?:[];
             $extra["refund_disagree_reason"] = $request->input("reason");
@@ -170,5 +177,44 @@ class OrdersController extends AdminController
         }
 
         return $order;
+    }
+
+    public function _refundOrder(Order $order){
+        //判断付款方式
+        switch ($order->payment_method){
+            case "wechat":
+                //留空
+                break;
+            case "alipay":
+                //获取退款订单号
+                $refundNo = Order::getAvailableRefundNo();
+                //支付宝退款方法
+                $ret = app("alipay")->refund([
+                    'out_trade_no' => $order->no, // 之前的订单流水号
+                    'refund_amount' => $order->total_amount, // 退款金额，单位元
+                    'out_request_no' => $refundNo, // 退款订单号
+                ]);
+                if($ret->sub_code){
+                    //sub_code表示 退款失败
+                    $extra = $order->extra;
+                    //退款失败号
+                    $extra['refund_failed_code'] = $ret->sub_code;
+                    $order->update([
+                        "refund_no" => $refundNo,
+                        "refund_status" => Order::REFUND_STATUS_FAILED,
+                        "extra"     => $extra,
+                    ]);
+                } else {
+                    //退款成功
+                    $order->update([
+                        "refund_no" => $refundNo,
+                        "refund_status" => Order::REFUND_STATUS_SUCCESS,
+                    ]);
+                }
+                break;
+            default:
+                throw new InvalidRequestException("未知的订单支付方式".$order->payment_method);
+                break;
+        }
     }
 }
