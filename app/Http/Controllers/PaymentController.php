@@ -31,25 +31,10 @@ class PaymentController extends Controller {
     //前端回调
     public function alipayReturn(){
         try {
-            $data = app("alipay")->verify();
+            app("alipay")->verify();
         } catch (\Exception $e){
             return view("pages.error",["msg"=>"数据不正确"]);
         }
-        $order = Order::where("no",$data->out_trade_no)->first();
-        if(!$order){
-            return view("pages.error",["msg"=>"订单不存在"]);
-        }
-        if($order->paid_at){
-            app("alipay")->success();
-            return view("pages.success",["msg"=>"付款成功"]);
-        }
-        $order->update([
-            "paid_at" => Carbon::now(),
-            "payment_method" => "alipay",
-            "payment_no" => $data->trade_no,
-        ]);
-        app("alipay")->success();
-        $this->afterPaid($order);
         return view("pages.success",["msg"=>"付款成功"]);
     }
 
