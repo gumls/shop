@@ -2,12 +2,14 @@
 
 namespace App\Models;
 
+use Encore\Admin\Traits\DefaultDatetimeFormat;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 class CouponCode extends Model
 {
-    use HasFactory;
+    use HasFactory,DefaultDatetimeFormat;
 
     const TYPE_FIXED = 'fixed';
     const TYPE_PERCENT = 'percent';
@@ -35,4 +37,12 @@ class CouponCode extends Model
     ];
 
     protected $dates = ["not_before","not_after"];
+
+    public static function createCode($len=16){
+        do {
+            $code = strtoupper(Str::random($len));
+        } while (self::query()->where("code",$code)->exists());
+
+        return $code;
+    }
 }
