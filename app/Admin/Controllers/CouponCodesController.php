@@ -30,6 +30,10 @@ class CouponCodesController extends AdminController
         $grid->column('id', __('ID'))->sortable();
         $grid->column('name', __('名称'));
         $grid->column('code', __('优惠券码'));
+        $grid->column('description', __('描述'));
+        $grid->column('usage', __('描述'))->display(function ($v){
+            return $this->used."/".$this->total;
+        });
         $grid->column('type', __('类型'))->display(function ($v){
             return CouponCode::$typeMap[$v];
         });

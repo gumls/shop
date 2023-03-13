@@ -38,11 +38,24 @@ class CouponCode extends Model
 
     protected $dates = ["not_before","not_after"];
 
+    protected $appends = ["description"];
+
     public static function createCode($len=16){
         do {
             $code = strtoupper(Str::random($len));
         } while (self::query()->where("code",$code)->exists());
 
         return $code;
+    }
+
+    public function getDescriptionAttribute(){
+        $str = "";
+        if($this->min_amount > 0){
+            $str = "满".$this->min_amount;
+        }
+        if($this->type == self::TYPE_PERCENT){
+            return $str."优惠".$this->value."%";
+        }
+        return $str."减".$this->value;
     }
 }
