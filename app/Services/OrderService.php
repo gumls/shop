@@ -18,7 +18,7 @@ class OrderService {
     public function store(User $user,UserAddress $address,$remark,$items,CouponCode $coupon = null){
         //先检查是否可用
         if($coupon){
-            $coupon->checkAvailable();
+            $coupon->checkAvailable($user);
         }
         $order = DB::transaction(function ()use ($user,$address,$remark,$items,$coupon){
             // 更新此地址的最后使用时间
@@ -59,7 +59,7 @@ class OrderService {
             }
             if($coupon){
                 //再次检车优惠券
-                $coupon->checkAvailable($totalAmount);
+                $coupon->checkAvailable($user,$totalAmount);
                 //使用优惠券之后的金额
                 $totalAmount = $coupon->getAdjustedPrice($totalAmount);
                 //订单与优惠券关联
