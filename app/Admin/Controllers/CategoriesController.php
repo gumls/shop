@@ -77,7 +77,7 @@ class CategoriesController extends AdminController
      *
      * @return Form
      */
-    protected function form($isEditing = true)
+    protected function form($isEditing = false)
     {
         $form = new Form(new Category());
 
