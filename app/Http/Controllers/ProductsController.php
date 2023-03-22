@@ -51,6 +51,7 @@ class ProductsController extends Controller {
             "filters"  => [
                 "search" => $search,
                 "order"  => $order,
+                "category"  => $category ?? null,
             ]
         ]);
     }
