@@ -104,7 +104,7 @@ class CategoriesController extends AdminController
     public function apiIndex(Request $request){
         $search = $request->input("q");
         $result = Category::query()
-            ->where("is_directory",true)
+            ->where("is_directory",boolval($request->input("is_directory",true)))
             ->where("name","like","%".$search."%")
             ->paginate();
         //查询的结果修改为laravel-admin需要的格式
