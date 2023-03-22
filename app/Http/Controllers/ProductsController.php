@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Exceptions\InvalidRequestException;
+use App\Models\Category;
 use App\Models\OrderItem;
 use App\Models\Product;
 use Illuminate\Http\Request;
@@ -24,6 +25,16 @@ class ProductsController extends Controller {
                             ->orWhere('description', 'like', $like);
                     });
             });
+        }
+        //筛选类目
+        if($request->input("category_id") && $category = Category::find($request->input("category_id"))){
+            if($category->is_directory){
+                $bulider->whereHas("category",function ($query)use ($category){
+                    $query->where("path","like",$category->path.$category->id."-%");
+                });
+            } else {
+                $bulider->where("category_id",$request->input("category_id"));
+            }
         }
         //是否有排序
         if($order = $request->input("order","")){
