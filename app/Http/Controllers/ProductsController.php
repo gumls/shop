@@ -48,10 +48,10 @@ class ProductsController extends Controller {
         $products = $bulider->paginate(16);
         return view("products.index",[
             "products" => $products,
+            "category"  => $category ?? null,
             "filters"  => [
                 "search" => $search,
                 "order"  => $order,
-                "category"  => $category ?? null,
             ]
         ]);
     }
