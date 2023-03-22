@@ -6,11 +6,12 @@ use App\Exceptions\InvalidRequestException;
 use App\Models\Category;
 use App\Models\OrderItem;
 use App\Models\Product;
+use App\Services\CategoryService;
 use Illuminate\Http\Request;
 
 class ProductsController extends Controller {
     //
-    public function index(Request $request){
+    public function index(Request $request,CategoryService $categoryService){
         //构造一个查询构造器
         $bulider = Product::query()->where("on_sale",true);
         // 判断是否有提交 search 参数，如果有就赋值给 $search 变量
@@ -49,6 +50,7 @@ class ProductsController extends Controller {
         return view("products.index",[
             "products" => $products,
             "category"  => $category ?? null,
+            "categoryTree" => $categoryService->getCategoryTree(),
             "filters"  => [
                 "search" => $search,
                 "order"  => $order,
