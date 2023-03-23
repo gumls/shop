@@ -50,7 +50,6 @@ class ProductsController extends Controller {
         return view("products.index",[
             "products" => $products,
             "category"  => $category ?? null,
-            "categoryTree" => $categoryService->getCategoryTree(),
             "filters"  => [
                 "search" => $search,
                 "order"  => $order,
